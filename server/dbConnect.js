@@ -1,11 +1,10 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
-// const { dotenv } = pkg;
 
-dotenv.config();
 
 const dbConnect = async () => {
     let connection;
+    dotenv.config();
     try {
         connection = await mysql.createConnection({
             host: process.env.DATABASE_HOSTNAME,
@@ -16,6 +15,7 @@ const dbConnect = async () => {
             connectionLimit: 10,
             queueLimit: 0
         });
+        console.log(`Connected to database`);
         return connection;
     }
     catch (err) {
@@ -24,4 +24,16 @@ const dbConnect = async () => {
     }
 };
 
-export { dbConnect };
+const dbMiddleware = async (req, res, next) => {
+    try {
+        req.context = {
+            connection: await dbConnect()
+        };
+        next();
+    } catch (error) {
+        console.error('Database connection failed:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+export default dbMiddleware;
