@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import { postRouter } from './router/post_router.js';
 import { dbConnect } from './dbConnect.js';
 
 dbConnect();
